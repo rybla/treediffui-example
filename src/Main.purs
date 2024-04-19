@@ -7,10 +7,14 @@ import Control.Monad.State (StateT, evalStateT, modify, runStateT)
 import Data.Array as Array
 import Data.List.Lazy (replicate)
 import Data.Maybe (Maybe(..))
+import Data.String as String
 import Data.Traversable (sequence, traverse, traverse_)
+import Data.UUID (genUUID)
 import Effect (Effect)
 import Effect.Class.Console as Console
 import Effect.Console (log)
+import Effect.Ref (Ref)
+import Effect.Ref as Ref
 import Effect.Unsafe (unsafePerformEffect)
 import Partial.Unsafe (unsafeCrashWith)
 
@@ -28,16 +32,23 @@ examples =
   , { label: "remove {B2 C4 {} C6}"
     , diff: InjectDiff [ IdDiff, MinusDiff 1 IdDiff, IdDiff ]
     }
+  , { label: "cut B1 ..."
+    , diff: InjectDiff [ CutDiff "HOLE", IdDiff, IdDiff ]
+    }
+  , { label: "... then paste onto B3"
+    , diff: InjectDiff [ IdDiff, IdDiff, PasteDiff ]
+    }
   ]
 
 main :: Effect Unit
 main = do
   Console.log "[main]"
+  tree_ref <- Ref.new example_tree
   fromTreeCreateDom example_tree
   examples_container <- getElementById "examples"
   examples
     # traverse_ \{ label, diff } -> do
-        btn <- createButton { label, onclick: applyTreeDiffToDom diff example_tree }
+        btn <- createButton { label, onclick: applyTreeDiffToDom diff tree_ref }
         addKid examples_container btn
   pure unit
 
@@ -66,22 +77,29 @@ data TreeDiff
   | MinusDiff Int TreeDiff
   | ReplaceDiff Tree
   | IdDiff
+  | CutDiff TreeLabel
+  | PasteDiff
 
-applyTreeDiffToTree :: TreeDiff -> Tree -> Tree
-applyTreeDiffToTree (InjectDiff dts) (Tree l ts) = Tree l (Array.zipWith applyTreeDiffToTree dts ts)
+applyTreeDiffToTree :: TreeDiff -> Tree -> Effect Tree
+applyTreeDiffToTree (InjectDiff dts) (Tree l ts) = Tree l <$> Array.zipWithA applyTreeDiffToTree dts ts
 
-applyTreeDiffToTree (PlusDiff th td) t = unTooth th (applyTreeDiffToTree td t)
+applyTreeDiffToTree (PlusDiff th td) t = unTooth th <$> applyTreeDiffToTree td t
 
 applyTreeDiffToTree (MinusDiff i td) (Tree _ ts) = applyTreeDiffToTree td (ts Array.!! i # unsafeFromJust)
 
-applyTreeDiffToTree (ReplaceDiff t') _ = t'
+applyTreeDiffToTree (ReplaceDiff t') _ = t' # pure
 
-applyTreeDiffToTree IdDiff t = t
+applyTreeDiffToTree IdDiff t = t # pure
 
-applyTreeDiffToDom :: TreeDiff -> Tree -> Effect Unit
-applyTreeDiffToDom d t = do
-  let
-    t' = applyTreeDiffToTree d t
+applyTreeDiffToTree (CutDiff id) _ = Tree id [] # pure
+
+applyTreeDiffToTree PasteDiff _ = get_clipboard <#> _.tree
+
+applyTreeDiffToDom :: TreeDiff -> Ref Tree -> Effect Unit
+applyTreeDiffToDom d t_ref = do
+  t <- Ref.read t_ref
+  t' <- applyTreeDiffToTree d t
+  Ref.write t' t_ref
   setTreeDisplay (show t')
   applyTreeDiffToDom' d t
 
@@ -95,7 +113,6 @@ applyTreeDiffToDom' (PlusDiff (Tooth l1 ts_left ts_right) td) t@(Tree l2 ts) = d
   -- e2 will be a kid of e1
   e2 <- getElement l2
   es_right <- ts_right # traverse fromTreeCreateElement
-  Console.log "#0"
   e_parent <- getParent e2
   -- create a tmp e1 that has no kids, but will eventually be the parent of e2
   e1 <- createElement l1 []
@@ -111,18 +128,31 @@ applyTreeDiffToDom' (MinusDiff i td) (Tree l ts) = do
   t_kid@(Tree l_kid _) <- ts Array.!! i # unsafeFromJust # pure
   applyTreeDiffToDom' td t_kid -- RECURSE
   e_kid <- getElement l_kid
-  Console.log "#1"
   e_parent <- getParent e
   replaceKid e_parent { old: e, new: e_kid }
 
 applyTreeDiffToDom' (ReplaceDiff t') (Tree l _) = do
   e <- getElement l
-  Console.log "#2"
   e_parent <- getParent e
   e' <- fromTreeCreateElement t'
   replaceKid e_parent { old: e, new: e' }
 
 applyTreeDiffToDom' IdDiff _ = pure unit
+
+applyTreeDiffToDom' (CutDiff l') t@(Tree l _) = do
+  e <- getElement l
+  e_parent <- getParent e
+  e' <- createElement l' []
+  replaceKid e_parent { old: e, new: e' }
+  set_clipboard { tree: t, element: e }
+  pure unit
+
+applyTreeDiffToDom' PasteDiff (Tree l _) = do
+  e <- getElement l
+  e_parent <- getParent e
+  clipboard <- get_clipboard
+  replaceKid e_parent { old: e, new: clipboard.element }
+  pure unit
 
 fromTreeCreateDom :: Tree -> Effect Unit
 fromTreeCreateDom t = do
@@ -160,3 +190,9 @@ foreign import createButton :: { label :: String, onclick :: Effect Unit } -> Ef
 foreign import getElementById :: String -> Effect Element
 
 foreign import setTreeDisplay :: String -> Effect Unit
+
+foreign import removeKid :: Element -> Element -> Effect Unit
+
+foreign import set_clipboard :: { tree :: Tree, element :: Element } -> Effect Unit
+
+foreign import get_clipboard :: Effect { tree :: Tree, element :: Element }

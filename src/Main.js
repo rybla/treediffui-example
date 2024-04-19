@@ -66,9 +66,25 @@ export const createButton = ({ label, onclick }) => () => {
     return e
 }
 
+export const removeKid = (parent) => (kid) => () => {
+    parent.removeChild(kid)
+}
+
 export const getElementById = (id) => () => document.getElementById(id)
 
 export const setTreeDisplay = (str) => () => {
     const e = document.getElementById('tree_display')
     e.innerText = str
+}
+
+// foreign import set_clipboard :: { tree:: Tree, element :: Element } -> Effect Unit
+// foreign import get_clipboard :: Effect { tree:: Tree, element :: Element }
+var clipboard = undefined
+export const set_clipboard = (v) => () => {
+    console.log("set_clipboard")
+    clipboard = v
+}
+export const get_clipboard = () => {
+    console.log("get_clipboard")
+    return clipboard
 }

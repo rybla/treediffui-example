@@ -51,10 +51,22 @@ var createButton = ({ label, onclick }) => () => {
   e.onclick = () => onclick();
   return e;
 };
+var removeKid = (parent) => (kid) => () => {
+  parent.removeChild(kid);
+};
 var getElementById = (id) => () => document.getElementById(id);
 var setTreeDisplay = (str) => () => {
   const e = document.getElementById("tree_display");
   e.innerText = str;
+};
+var clipboard = void 0;
+var set_clipboard = (v) => () => {
+  console.log("set_clipboard");
+  clipboard = v;
+};
+var get_clipboard = () => {
+  console.log("get_clipboard");
+  return clipboard;
 };
 
 // output/Control.Semigroupoid/index.js
@@ -132,10 +144,10 @@ var apply = function(dict) {
 };
 var applySecond = function(dictApply) {
   var apply1 = apply(dictApply);
-  var map2 = map(dictApply.Functor0());
+  var map3 = map(dictApply.Functor0());
   return function(a) {
     return function(b) {
-      return apply1(map2($$const(identity2))(a))(b);
+      return apply1(map3($$const(identity2))(a))(b);
     };
   };
 };
@@ -338,6 +350,28 @@ var $lazy_applyEffect = /* @__PURE__ */ $runtime_lazy("applyEffect", "Effect", f
 });
 var functorEffect = /* @__PURE__ */ $lazy_functorEffect(20);
 
+// output/Effect.Ref/foreign.js
+var _new = function(val) {
+  return function() {
+    return { value: val };
+  };
+};
+var read = function(ref) {
+  return function() {
+    return ref.value;
+  };
+};
+var write = function(val) {
+  return function(ref) {
+    return function() {
+      ref.value = val;
+    };
+  };
+};
+
+// output/Effect.Ref/index.js
+var $$new = _new;
+
 // output/Data.Foldable/foreign.js
 var foldrArray = function(f) {
   return function(init) {
@@ -480,7 +514,7 @@ var traverseArrayImpl = /* @__PURE__ */ function() {
     };
   }
   return function(apply2) {
-    return function(map2) {
+    return function(map3) {
       return function(pure3) {
         return function(f) {
           return function(array) {
@@ -489,14 +523,14 @@ var traverseArrayImpl = /* @__PURE__ */ function() {
                 case 0:
                   return pure3([]);
                 case 1:
-                  return map2(array1)(f(array[bot]));
+                  return map3(array1)(f(array[bot]));
                 case 2:
-                  return apply2(map2(array2)(f(array[bot])))(f(array[bot + 1]));
+                  return apply2(map3(array2)(f(array[bot])))(f(array[bot + 1]));
                 case 3:
-                  return apply2(apply2(map2(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
+                  return apply2(apply2(map3(array3)(f(array[bot])))(f(array[bot + 1])))(f(array[bot + 2]));
                 default:
                   var pivot = bot + Math.floor((top2 - bot) / 4) * 2;
-                  return apply2(map2(concat2)(go(bot, pivot)))(go(pivot, top2));
+                  return apply2(map3(concat2)(go(bot, pivot)))(go(pivot, top2));
               }
             }
             return go(0, array.length);
@@ -614,13 +648,14 @@ var unsafeCrashWith = function(msg) {
 // output/Main/index.js
 var append2 = /* @__PURE__ */ append(semigroupArray);
 var traverse2 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
-var $$void2 = /* @__PURE__ */ $$void(functorEffect);
+var map2 = /* @__PURE__ */ map(functorEffect);
 var zipWithA2 = /* @__PURE__ */ zipWithA(applicativeEffect);
-var log3 = /* @__PURE__ */ log2(monadEffectEffect);
-var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
 var pure2 = /* @__PURE__ */ pure(applicativeEffect);
+var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
+var $$void2 = /* @__PURE__ */ $$void(functorEffect);
+var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
 var intercalate3 = /* @__PURE__ */ intercalate2(monoidString);
-var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorArray);
+var mapFlipped1 = /* @__PURE__ */ mapFlipped(functorArray);
 var Tree = /* @__PURE__ */ function() {
   function Tree2(value0, value1) {
     this.value0 = value0;
@@ -703,6 +738,23 @@ var IdDiff = /* @__PURE__ */ function() {
   IdDiff2.value = new IdDiff2();
   return IdDiff2;
 }();
+var CutDiff = /* @__PURE__ */ function() {
+  function CutDiff2(value0) {
+    this.value0 = value0;
+  }
+  ;
+  CutDiff2.create = function(value0) {
+    return new CutDiff2(value0);
+  };
+  return CutDiff2;
+}();
+var PasteDiff = /* @__PURE__ */ function() {
+  function PasteDiff2() {
+  }
+  ;
+  PasteDiff2.value = new PasteDiff2();
+  return PasteDiff2;
+}();
 var unsafeFromJust = function(v) {
   if (v instanceof Nothing) {
     return unsafeCrashWith("unsafeFromJust Nothing");
@@ -712,7 +764,7 @@ var unsafeFromJust = function(v) {
     return v.value0;
   }
   ;
-  throw new Error("Failed pattern match at Main (line 140, column 18 - line 142, column 14): " + [v.constructor.name]);
+  throw new Error("Failed pattern match at Main (line 170, column 18 - line 172, column 14): " + [v.constructor.name]);
 };
 var unTooth = function(v) {
   return function(t) {
@@ -735,6 +787,12 @@ var examples = /* @__PURE__ */ function() {
   }, {
     label: "remove {B2 C4 {} C6}",
     diff: new InjectDiff([IdDiff.value, new MinusDiff(1, IdDiff.value), IdDiff.value])
+  }, {
+    label: "cut B1 ...",
+    diff: new InjectDiff([new CutDiff("HOLE"), IdDiff.value, IdDiff.value])
+  }, {
+    label: "... then paste onto B3",
+    diff: new InjectDiff([IdDiff.value, IdDiff.value, PasteDiff.value])
   }];
 }();
 var example_tree = /* @__PURE__ */ function() {
@@ -743,11 +801,11 @@ var example_tree = /* @__PURE__ */ function() {
 var applyTreeDiffToTree = function(v) {
   return function(v1) {
     if (v instanceof InjectDiff) {
-      return new Tree(v1.value0, zipWith(applyTreeDiffToTree)(v.value0)(v1.value1));
+      return map2(Tree.create(v1.value0))(zipWithA2(applyTreeDiffToTree)(v.value0)(v1.value1));
     }
     ;
     if (v instanceof PlusDiff) {
-      return unTooth(v.value0)(applyTreeDiffToTree(v.value1)(v1));
+      return map2(unTooth(v.value0))(applyTreeDiffToTree(v.value1)(v1));
     }
     ;
     if (v instanceof MinusDiff) {
@@ -755,14 +813,24 @@ var applyTreeDiffToTree = function(v) {
     }
     ;
     if (v instanceof ReplaceDiff) {
-      return v.value0;
+      return pure2(v.value0);
     }
     ;
     if (v instanceof IdDiff) {
-      return v1;
+      return pure2(v1);
     }
     ;
-    throw new Error("Failed pattern match at Main (line 70, column 1 - line 70, column 48): " + [v.constructor.name, v1.constructor.name]);
+    if (v instanceof CutDiff) {
+      return pure2(new Tree(v.value0, []));
+    }
+    ;
+    if (v instanceof PasteDiff) {
+      return mapFlipped2(get_clipboard)(function(v2) {
+        return v2.tree;
+      });
+    }
+    ;
+    throw new Error("Failed pattern match at Main (line 83, column 1 - line 83, column 55): " + [v.constructor.name, v1.constructor.name]);
   };
 };
 var applyTreeDiffToDom$prime = function(v) {
@@ -777,7 +845,6 @@ var applyTreeDiffToDom$prime = function(v) {
         var es_left = traverse2(fromTreeCreateElement)(v.value0.value1)();
         var e2 = getElement(v1.value0)();
         var es_right = traverse2(fromTreeCreateElement)(v.value0.value2)();
-        log3("#0")();
         var e_parent = getParent(e2)();
         var e1 = createElement(v.value0.value0)([])();
         replaceKid(e_parent)({
@@ -796,7 +863,6 @@ var applyTreeDiffToDom$prime = function(v) {
         var v2 = unsafeFromJust(index(v1.value1)(v.value0));
         applyTreeDiffToDom$prime(v.value1)(v2)();
         var e_kid = getElement(v2.value0)();
-        log3("#1")();
         var e_parent = getParent(e)();
         return replaceKid(e_parent)({
           old: e,
@@ -808,7 +874,6 @@ var applyTreeDiffToDom$prime = function(v) {
     if (v instanceof ReplaceDiff) {
       return function __do2() {
         var e = getElement(v1.value0)();
-        log3("#2")();
         var e_parent = getParent(e)();
         var e$prime = fromTreeCreateElement(v.value0)();
         return replaceKid(e_parent)({
@@ -822,7 +887,37 @@ var applyTreeDiffToDom$prime = function(v) {
       return pure2(unit);
     }
     ;
-    throw new Error("Failed pattern match at Main (line 88, column 1 - line 88, column 55): " + [v.constructor.name, v1.constructor.name]);
+    if (v instanceof CutDiff) {
+      return function __do2() {
+        var e = getElement(v1.value0)();
+        var e_parent = getParent(e)();
+        var e$prime = createElement(v.value0)([])();
+        replaceKid(e_parent)({
+          old: e,
+          "new": e$prime
+        })();
+        set_clipboard({
+          tree: v1,
+          element: e
+        })();
+        return unit;
+      };
+    }
+    ;
+    if (v instanceof PasteDiff) {
+      return function __do2() {
+        var e = getElement(v1.value0)();
+        var e_parent = getParent(e)();
+        var clipboard2 = get_clipboard();
+        replaceKid(e_parent)({
+          old: e,
+          "new": clipboard2.element
+        })();
+        return unit;
+      };
+    }
+    ;
+    throw new Error("Failed pattern match at Main (line 106, column 1 - line 106, column 55): " + [v.constructor.name, v1.constructor.name]);
   };
 };
 var _Show_Tree = {
@@ -832,17 +927,19 @@ var _Show_Tree = {
     }
     ;
     if (otherwise) {
-      return "(" + (v.value0 + (" " + (intercalate3(" ")(mapFlipped2(v.value1)(show(_Show_Tree))) + ")")));
+      return "(" + (v.value0 + (" " + (intercalate3(" ")(mapFlipped1(v.value1)(show(_Show_Tree))) + ")")));
     }
     ;
-    throw new Error("Failed pattern match at Main (line 50, column 1 - line 53, column 85): " + [v.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 61, column 1 - line 64, column 85): " + [v.constructor.name]);
   }
 };
 var show2 = /* @__PURE__ */ show(_Show_Tree);
 var applyTreeDiffToDom = function(d) {
-  return function(t) {
-    var t$prime = applyTreeDiffToTree(d)(t);
+  return function(t_ref) {
     return function __do2() {
+      var t = read(t_ref)();
+      var t$prime = applyTreeDiffToTree(d)(t)();
+      write(t$prime)(t_ref)();
       setTreeDisplay(show2(t$prime))();
       return applyTreeDiffToDom$prime(d)(t)();
     };
@@ -857,14 +954,15 @@ var fromTreeCreateDom = function(t) {
   };
 };
 var main = function __do() {
-  log3("[main]")();
+  log2(monadEffectEffect)("[main]")();
+  var tree_ref = $$new(example_tree)();
   fromTreeCreateDom(example_tree)();
   var examples_container = getElementById("examples")();
   traverse_2(function(v) {
     return function __do2() {
       var btn = createButton({
         label: v.label,
-        onclick: applyTreeDiffToDom(v.diff)(example_tree)
+        onclick: applyTreeDiffToDom(v.diff)(tree_ref)
       })();
       return addKid(examples_container)(btn)();
     };
@@ -872,9 +970,11 @@ var main = function __do() {
   return unit;
 };
 export {
+  CutDiff,
   IdDiff,
   InjectDiff,
   MinusDiff,
+  PasteDiff,
   PlusDiff,
   ReplaceDiff,
   Tooth,
@@ -894,9 +994,12 @@ export {
   getElement,
   getElementById,
   getParent,
+  get_clipboard,
   main,
+  removeKid,
   replaceKid,
   setTreeDisplay,
+  set_clipboard,
   unTooth,
   unsafeFromJust
 };
