@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "spago build",
-    "bundle": "spago bundle-module --platform browser --source-maps --to dist/main.js",
-    "bundle-watch": "spago bundle-module --platform browser --source-maps --to dist/main.js --watch",
-    "serve": "http-server dist"
+    "bundle": "spago bundle-module --platform browser --source-maps --to docs/main.js",
+    "bundle-watch": "spago bundle-module --platform browser --source-maps --to docs/main.js --watch",
+    "serve": "http-server docs"
   },
   "keywords": [],
   "author": "",
