@@ -22,6 +22,8 @@ to generate this file without the comments in this block.
   , "partial"
   , "prelude"
   , "random"
+  , "refs"
+  , "strings"
   , "transformers"
   , "tuples"
   , "uuid"

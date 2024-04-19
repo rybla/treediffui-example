@@ -4,11 +4,22 @@
 <body style="padding: 0.5em; display: flex; flex-direction: column; gap: 0.5em">
     <div style="display: flex; flex-direction: column; gap: 0.5em">
         <div style="font-weight: bold;">treediffui</div>
+        <div>These examples are meant to be run <i>independently</i>, execpt for the "cut B1 ... then paste onto B3"
+            pair of examples. Reset the state by refreshing the page.</div>
+        <div>
+            See <code><a href="https://github.com/rybla/treediffui-example/blob/main/src/Main.purs">Main.purs</a></code>
+            for reference of how the tree diffs are encoded for each example (<code>examples</code>), how a tree diff is
+            applied to a tree (<code>applyTreeDiffToTree</code>) and how a tree diff is applied to the DOM
+            (<code>applyTreeDiffToDom</code>).
+        </div>
+        <div>Examples:</div>
         <div id="examples" style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap;"></div>
     </div>
     <hr />
-    <div id="tree_display" type="padding: 0.5em"></div>
-    <div id="container" type="padding: 0.5em"></div>
+    <div>Tree as String</div>
+    <div id="tree_display" style="padding: 0.5em; box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5);"></div>
+    <div>Tree as HTML</div>
+    <div id="container" style="padding: 0.5em; box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5);"></div>
 </body>
 
 <head>
@@ -26,7 +37,9 @@
 
         .node {
             padding: 0.5em;
-            border: 1px solid black;
+            /* border: 1px solid black; */
+            box-shadow: 0 0 0.5em 0 rgba(0, 0, 0, 0.7);
+            border-radius: 1em;
             display: inline-flex;
             flex-direction: row;
             flex-wrap: wrap;
