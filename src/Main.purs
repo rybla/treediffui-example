@@ -5,8 +5,10 @@ import Data.Tuple.Nested
 import Prelude
 import Control.Monad.State (StateT, evalStateT, modify, runStateT)
 import Data.Array as Array
+import Data.Generic.Rep (class Generic)
 import Data.List.Lazy (replicate)
 import Data.Maybe (Maybe(..))
+import Data.Show.Generic (genericShow)
 import Data.String as String
 import Data.Traversable (sequence, traverse, traverse_)
 import Data.UUID (genUUID)
@@ -23,22 +25,14 @@ example_tree = "A1" % [ "B1" % [ "C1" % [], "C2" % [], "C3" % [] ], "B2" % [ "C4
 
 examples :: Array { label :: String, diff :: TreeDiff }
 examples =
-  [ { label: "insert {X Y1 {} Y2} at A1"
-    , diff: PlusDiff (Tooth "X" [ "Y1" % [] ] [ "Y2" % [] ]) IdDiff
-    }
-  , { label: "insert {X Y1 {} Y2} at B2"
-    , diff: InjectDiff [ IdDiff, PlusDiff (Tooth "X" [ "Y1" % [] ] [ "Y2" % [] ]) IdDiff, IdDiff ]
-    }
-  , { label: "remove {B2 C4 {} C6}"
-    , diff: InjectDiff [ IdDiff, MinusDiff 1 IdDiff, IdDiff ]
-    }
-  , { label: "cut B1 ..."
-    , diff: InjectDiff [ CutDiff "HOLE", IdDiff, IdDiff ]
-    }
-  , { label: "... then paste onto B3"
-    , diff: InjectDiff [ IdDiff, IdDiff, PasteDiff ]
-    }
+  [ makeExample "insert tooth at top" (PlusDiff (Tooth "X" [ "Y1" % [] ] [ "Y2" % [] ]) IdDiff)
+  , makeExample "insert tooth deeply" (InjectDiff [ IdDiff, PlusDiff (Tooth "X" [ "Y1" % [] ] [ "Y2" % [] ]) IdDiff, IdDiff ])
+  , makeExample "remove tooth" (InjectDiff [ IdDiff, MinusDiff 1 IdDiff, IdDiff ])
+  , makeExample "cut ..." (InjectDiff [ CutDiff "HOLE", IdDiff, IdDiff ])
+  , makeExample "... and paste" (InjectDiff [ IdDiff, IdDiff, PasteDiff ])
   ]
+  where
+  makeExample title diff = { label: title <> " :: " <> show diff, diff }
 
 main :: Effect Unit
 main = do
@@ -58,15 +52,25 @@ type TreeLabel
 data Tree
   = Tree TreeLabel (Array Tree)
 
+derive instance _Generic_Tree :: Generic Tree _
+
 instance _Show_Tree :: Show Tree where
-  show (Tree id ts)
-    | Array.null ts = id
-    | otherwise = "(" <> id <> " " <> ((ts <#> show) # Array.intercalate " ") <> ")"
+  show x = genericShow x
+
+prettyTree :: Tree -> String
+prettyTree (Tree id ts)
+  | Array.null ts = id
+  | otherwise = "(" <> id <> " " <> ((ts <#> prettyTree) # Array.intercalate " ") <> ")"
 
 infix 4 Tree as %
 
 data Tooth
   = Tooth TreeLabel (Array Tree) (Array Tree)
+
+derive instance _Generic_Tooth :: Generic Tooth _
+
+instance _Show_Tooth :: Show Tooth where
+  show x = genericShow x
 
 unTooth :: Tooth -> Tree -> Tree
 unTooth (Tooth l ts_left ts_right) t = Tree l (ts_left <> [ t ] <> ts_right)
@@ -79,6 +83,11 @@ data TreeDiff
   | IdDiff
   | CutDiff TreeLabel
   | PasteDiff
+
+derive instance _Generic_TreeDiff :: Generic TreeDiff _
+
+instance _Show_TreeDiff :: Show TreeDiff where
+  show x = genericShow x
 
 applyTreeDiffToTree :: TreeDiff -> Tree -> Effect Tree
 applyTreeDiffToTree (InjectDiff dts) (Tree l ts) = Tree l <$> Array.zipWithA applyTreeDiffToTree dts ts
@@ -100,7 +109,7 @@ applyTreeDiffToDom d t_ref = do
   t <- Ref.read t_ref
   t' <- applyTreeDiffToTree d t
   Ref.write t' t_ref
-  setTreeDisplay (show t')
+  setTreeDisplay (prettyTree t')
   applyTreeDiffToDom' d t
 
 applyTreeDiffToDom' :: TreeDiff -> Tree -> Effect Unit
@@ -156,7 +165,7 @@ applyTreeDiffToDom' PasteDiff (Tree l _) = do
 
 fromTreeCreateDom :: Tree -> Effect Unit
 fromTreeCreateDom t = do
-  setTreeDisplay (show t)
+  setTreeDisplay (prettyTree t)
   e <- fromTreeCreateElement t
   c <- getContainer
   addKid c e

@@ -847,22 +847,15 @@ var unsafeCrashWith = function(msg) {
 
 // output/Main/index.js
 var append3 = /* @__PURE__ */ append(semigroupArray);
-var intercalate4 = /* @__PURE__ */ intercalate2(monoidString);
-var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorArray);
 var traverse2 = /* @__PURE__ */ traverse(traversableArray)(applicativeEffect);
 var map2 = /* @__PURE__ */ map(functorEffect);
 var zipWithA2 = /* @__PURE__ */ zipWithA(applicativeEffect);
 var pure2 = /* @__PURE__ */ pure(applicativeEffect);
-var mapFlipped1 = /* @__PURE__ */ mapFlipped(functorEffect);
+var mapFlipped2 = /* @__PURE__ */ mapFlipped(functorEffect);
 var $$void2 = /* @__PURE__ */ $$void(functorEffect);
 var traverse_2 = /* @__PURE__ */ traverse_(applicativeEffect)(foldableArray);
-var genericShowArgsArgument2 = /* @__PURE__ */ genericShowArgsArgument(showString);
-var genericShowArgsProduct2 = /* @__PURE__ */ genericShowArgsProduct(genericShowArgsArgument2);
-var TreeIsSymbol = {
-  reflectSymbol: function() {
-    return "Tree";
-  }
-};
+var intercalate4 = /* @__PURE__ */ intercalate2(monoidString);
+var mapFlipped1 = /* @__PURE__ */ mapFlipped(functorArray);
 var InjectDiffIsSymbol = {
   reflectSymbol: function() {
     return "InjectDiff";
@@ -873,7 +866,7 @@ var PlusDiffIsSymbol = {
     return "PlusDiff";
   }
 };
-var genericShowArgsProduct1 = /* @__PURE__ */ genericShowArgsProduct(/* @__PURE__ */ genericShowArgsArgument(showInt));
+var genericShowArgsProduct2 = /* @__PURE__ */ genericShowArgsProduct(/* @__PURE__ */ genericShowArgsArgument(showInt));
 var MinusDiffIsSymbol = {
   reflectSymbol: function() {
     return "MinusDiff";
@@ -988,36 +981,17 @@ var unsafeFromJust = function(v) {
     return v.value0;
   }
   ;
-  throw new Error("Failed pattern match at Main (line 179, column 18 - line 181, column 14): " + [v.constructor.name]);
+  throw new Error("Failed pattern match at Main (line 185, column 18 - line 187, column 14): " + [v.constructor.name]);
 };
 var unTooth = function(v) {
   return function(t) {
     return new Tree(v.value0, append3(v.value1)(append3([t])(v.value2)));
   };
 };
-var prettyTree = function(v) {
-  if ($$null(v.value1)) {
-    return v.value0;
-  }
-  ;
-  if (otherwise) {
-    return "(" + (v.value0 + (" " + (intercalate4(" ")(mapFlipped2(v.value1)(prettyTree)) + ")")));
-  }
-  ;
-  throw new Error("Failed pattern match at Main (line 60, column 1 - line 60, column 29): " + [v.constructor.name]);
-};
 var fromTreeCreateElement = function(v) {
   return function __do2() {
     var es = traverse2(fromTreeCreateElement)(v.value1)();
     return createElement(v.value0)(es)();
-  };
-};
-var fromTreeCreateDom = function(t) {
-  return function __do2() {
-    setTreeDisplay(prettyTree(t))();
-    var e = fromTreeCreateElement(t)();
-    var c = getContainer();
-    return addKid(c)(e)();
   };
 };
 var example_tree = /* @__PURE__ */ function() {
@@ -1050,12 +1024,12 @@ var applyTreeDiffToTree = function(v) {
     }
     ;
     if (v instanceof PasteDiff) {
-      return mapFlipped1(get_clipboard)(function(v2) {
+      return mapFlipped2(get_clipboard)(function(v2) {
         return v2.tree;
       });
     }
     ;
-    throw new Error("Failed pattern match at Main (line 92, column 1 - line 92, column 55): " + [v.constructor.name, v1.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 98, column 1 - line 98, column 55): " + [v.constructor.name, v1.constructor.name]);
   };
 };
 var applyTreeDiffToDom$prime = function(v) {
@@ -1142,20 +1116,65 @@ var applyTreeDiffToDom$prime = function(v) {
       };
     }
     ;
-    throw new Error("Failed pattern match at Main (line 115, column 1 - line 115, column 55): " + [v.constructor.name, v1.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 121, column 1 - line 121, column 55): " + [v.constructor.name, v1.constructor.name]);
   };
 };
+var _Show_Tree = {
+  show: function(v) {
+    if ($$null(v.value1)) {
+      return v.value0;
+    }
+    ;
+    if (otherwise) {
+      return "(" + (v.value0 + (" " + (intercalate4(" ")(mapFlipped1(v.value1)(show(_Show_Tree))) + ")")));
+    }
+    ;
+    throw new Error("Failed pattern match at Main (line 66, column 1 - line 69, column 85): " + [v.constructor.name]);
+  }
+};
+var show2 = /* @__PURE__ */ show(_Show_Tree);
+var genericShowSum2 = /* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor(/* @__PURE__ */ genericShowArgsArgument(_Show_Tree))({
+  reflectSymbol: function() {
+    return "ReplaceDiff";
+  }
+}))(/* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor2({
+  reflectSymbol: function() {
+    return "IdDiff";
+  }
+}))(/* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor(/* @__PURE__ */ genericShowArgsArgument(showString))({
+  reflectSymbol: function() {
+    return "CutDiff";
+  }
+}))(/* @__PURE__ */ genericShowConstructor2({
+  reflectSymbol: function() {
+    return "PasteDiff";
+  }
+}))));
 var applyTreeDiffToDom = function(d) {
   return function(t_ref) {
     return function __do2() {
       var t = read(t_ref)();
       var t$prime = applyTreeDiffToTree(d)(t)();
       write(t$prime)(t_ref)();
-      setTreeDisplay(prettyTree(t$prime))();
+      setTreeDisplay(show2(t$prime))();
       return applyTreeDiffToDom$prime(d)(t)();
     };
   };
 };
+var fromTreeCreateDom = function(t) {
+  return function __do2() {
+    setTreeDisplay(show2(t))();
+    var e = fromTreeCreateElement(t)();
+    var c = getContainer();
+    return addKid(c)(e)();
+  };
+};
+var _Show_Tooth = {
+  show: function(v) {
+    return "(" + (v.value0 + (" " + (intercalate4(" ")(mapFlipped1(v.value1)(show2)) + (" {} " + (intercalate4(" ")(mapFlipped1(v.value2)(show2)) + ")")))));
+  }
+};
+var genericShowArgsProduct1 = /* @__PURE__ */ genericShowArgsProduct(/* @__PURE__ */ genericShowArgsArgument(_Show_Tooth));
 var _Generic_TreeDiff = {
   to: function(x) {
     if (x instanceof Inl) {
@@ -1186,7 +1205,7 @@ var _Generic_TreeDiff = {
       return PasteDiff.value;
     }
     ;
-    throw new Error("Failed pattern match at Main (line 87, column 1 - line 87, column 56): " + [x.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 93, column 1 - line 93, column 56): " + [x.constructor.name]);
   },
   from: function(x) {
     if (x instanceof InjectDiff) {
@@ -1217,77 +1236,36 @@ var _Generic_TreeDiff = {
       return new Inr(new Inr(new Inr(new Inr(new Inr(new Inr(NoArguments.value))))));
     }
     ;
-    throw new Error("Failed pattern match at Main (line 87, column 1 - line 87, column 56): " + [x.constructor.name]);
+    throw new Error("Failed pattern match at Main (line 93, column 1 - line 93, column 56): " + [x.constructor.name]);
   }
 };
 var genericShow2 = /* @__PURE__ */ genericShow(_Generic_TreeDiff);
-var _Generic_Tree = {
-  to: function(x) {
-    return new Tree(x.value0, x.value1);
-  },
-  from: function(x) {
-    return new Product(x.value0, x.value1);
-  }
-};
-var genericShow1 = /* @__PURE__ */ genericShow(_Generic_Tree);
-var _Show_Tree = {
-  show: function(x) {
-    return genericShow1(genericShowConstructor(genericShowArgsProduct2(genericShowArgsArgument(showArray(_Show_Tree))))(TreeIsSymbol))(x);
-  }
-};
-var genericShowArgsArgument1 = /* @__PURE__ */ genericShowArgsArgument(/* @__PURE__ */ showArray(_Show_Tree));
-var genericShowSum2 = /* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor(/* @__PURE__ */ genericShowArgsArgument(_Show_Tree))({
-  reflectSymbol: function() {
-    return "ReplaceDiff";
-  }
-}))(/* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor2({
-  reflectSymbol: function() {
-    return "IdDiff";
-  }
-}))(/* @__PURE__ */ genericShowSum(/* @__PURE__ */ genericShowConstructor(genericShowArgsArgument2)({
-  reflectSymbol: function() {
-    return "CutDiff";
-  }
-}))(/* @__PURE__ */ genericShowConstructor2({
-  reflectSymbol: function() {
-    return "PasteDiff";
-  }
-}))));
-var _Generic_Tooth = {
-  to: function(x) {
-    return new Tooth(x.value0, x.value1.value0, x.value1.value1);
-  },
-  from: function(x) {
-    return new Product(x.value0, new Product(x.value1, x.value2));
-  }
-};
-var genericShow22 = /* @__PURE__ */ genericShow(_Generic_Tooth)(/* @__PURE__ */ genericShowConstructor(/* @__PURE__ */ genericShowArgsProduct2(/* @__PURE__ */ genericShowArgsProduct(genericShowArgsArgument1)(genericShowArgsArgument1)))({
-  reflectSymbol: function() {
-    return "Tooth";
-  }
-}));
-var _Show_Tooth = {
-  show: function(x) {
-    return genericShow22(x);
-  }
-};
-var genericShowArgsProduct22 = /* @__PURE__ */ genericShowArgsProduct(/* @__PURE__ */ genericShowArgsArgument(_Show_Tooth));
 var _Show_TreeDiff = {
   show: function(x) {
-    return genericShow2(genericShowSum(genericShowConstructor(genericShowArgsArgument(showArray(_Show_TreeDiff)))(InjectDiffIsSymbol))(genericShowSum(genericShowConstructor(genericShowArgsProduct22(genericShowArgsArgument(_Show_TreeDiff)))(PlusDiffIsSymbol))(genericShowSum(genericShowConstructor(genericShowArgsProduct1(genericShowArgsArgument(_Show_TreeDiff)))(MinusDiffIsSymbol))(genericShowSum2))))(x);
+    return genericShow2(genericShowSum(genericShowConstructor(genericShowArgsArgument(showArray(_Show_TreeDiff)))(InjectDiffIsSymbol))(genericShowSum(genericShowConstructor(genericShowArgsProduct1(genericShowArgsArgument(_Show_TreeDiff)))(PlusDiffIsSymbol))(genericShowSum(genericShowConstructor(genericShowArgsProduct2(genericShowArgsArgument(_Show_TreeDiff)))(MinusDiffIsSymbol))(genericShowSum2))))(x);
   }
 };
-var show2 = /* @__PURE__ */ show(_Show_TreeDiff);
+var show1 = /* @__PURE__ */ show(_Show_TreeDiff);
 var examples = /* @__PURE__ */ function() {
-  var makeExample = function(title) {
-    return function(diff) {
-      return {
-        label: title + (" :: " + show2(diff)),
-        diff
-      };
+  var makeExample = function(diff) {
+    return {
+      label: show1(diff),
+      diff
     };
   };
-  return [makeExample("insert tooth at top")(new PlusDiff(new Tooth("X", [new Tree("Y1", [])], [new Tree("Y2", [])]), IdDiff.value)), makeExample("insert tooth deeply")(new InjectDiff([IdDiff.value, new PlusDiff(new Tooth("X", [new Tree("Y1", [])], [new Tree("Y2", [])]), IdDiff.value), IdDiff.value])), makeExample("remove tooth")(new InjectDiff([IdDiff.value, new MinusDiff(1, IdDiff.value), IdDiff.value])), makeExample("cut ...")(new InjectDiff([new CutDiff("HOLE"), IdDiff.value, IdDiff.value])), makeExample("... and paste")(new InjectDiff([IdDiff.value, IdDiff.value, PasteDiff.value]))];
+  return [makeExample(new PlusDiff(new Tooth("X", [new Tree("Y1", [])], [new Tree("Y2", [])]), IdDiff.value)), makeExample(new PlusDiff(new Tooth("X", [new Tree("Y1", [])], [new Tree("Y2", [])]), IdDiff.value)), {
+    label: "insert {X Y1 {} Y2} at B2",
+    diff: new InjectDiff([IdDiff.value, new PlusDiff(new Tooth("X", [new Tree("Y1", [])], [new Tree("Y2", [])]), IdDiff.value), IdDiff.value])
+  }, {
+    label: "remove {B2 C4 {} C6}",
+    diff: new InjectDiff([IdDiff.value, new MinusDiff(1, IdDiff.value), IdDiff.value])
+  }, {
+    label: "cut B1 ...",
+    diff: new InjectDiff([new CutDiff("HOLE"), IdDiff.value, IdDiff.value])
+  }, {
+    label: "... then paste onto B3",
+    diff: new InjectDiff([IdDiff.value, IdDiff.value, PasteDiff.value])
+  }];
 }();
 var main = function __do() {
   log2(monadEffectEffect)("[main]")();
@@ -1305,6 +1283,14 @@ var main = function __do() {
   })(examples)();
   return unit;
 };
+var _Generic_Tooth = {
+  to: function(x) {
+    return new Tooth(x.value0, x.value1.value0, x.value1.value1);
+  },
+  from: function(x) {
+    return new Product(x.value0, new Product(x.value1, x.value2));
+  }
+};
 export {
   CutDiff,
   IdDiff,
@@ -1316,7 +1302,6 @@ export {
   Tooth,
   Tree,
   _Generic_Tooth,
-  _Generic_Tree,
   _Generic_TreeDiff,
   _Show_Tooth,
   _Show_Tree,
@@ -1337,7 +1322,6 @@ export {
   getParent,
   get_clipboard,
   main,
-  prettyTree,
   removeKid,
   replaceKid,
   setTreeDisplay,

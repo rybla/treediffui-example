@@ -12,6 +12,20 @@
             applied to a tree (<code>applyTreeDiffToTree</code>) and how a tree diff is applied to the DOM
             (<code>applyTreeDiffToDom</code>).
         </div>
+        <div>
+            A <code>TreeDiff</code> is defined inductively as follows:
+            <code><pre>data TreeDiff
+    = InjectDiff (Array TreeDiff)
+    | PlusDiff Tooth TreeDiff
+    | MinusDiff Int TreeDiff
+    | ReplaceDiff Tree
+    | IdDiff
+    | CutDiff TreeLabel
+    | PasteDiff</pre></code>
+        </div>
+        <div>
+            Note that <code>CutDiff</code> and <code>PasteDiff</code> use a reference to the clipboard when being applied. The other diff constructors are interpreted purely.
+        </div>
         <div>Examples:</div>
         <div id="examples" style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap;"></div>
     </div>
