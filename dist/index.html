@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body style="padding: 0.5em; display: flex; flex-direction: column; gap: 0.5em">
+    <div style="display: flex; flex-direction: column; gap: 0.5em">
+        <div style="font-weight: bold;">treediffui</div>
+        <div id="examples" style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap;"></div>
+    </div>
+    <hr />
+    <div id="tree_display" type="padding: 0.5em"></div>
+    <div id="container" type="padding: 0.5em"></div>
+</body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>treediffui</title>
+    <style>
+        .controls {
+            padding: 0.5em;
+            border-bottom: 1px solid black;
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+        }
+
+        .node {
+            padding: 0.5em;
+            border: 1px solid black;
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+
+        .node>.label {
+            color: blue;
+        }
+    </style>
+    <script type="module">
+        import * as Main from './main.js'
+        Main.main()
+    </script>
+</head>
+
+</html>

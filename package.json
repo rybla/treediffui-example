@@ -1,0 +1,23 @@
+{
+  "name": "treediffui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "spago build",
+    "bundle": "spago bundle-module --platform browser --source-maps --to dist/main.js",
+    "bundle-watch": "spago bundle-module --platform browser --source-maps --to dist/main.js --watch",
+    "serve": "http-server dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "purescript": "^0.15.15",
+    "spago": "^0.21.0"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  }
+}
